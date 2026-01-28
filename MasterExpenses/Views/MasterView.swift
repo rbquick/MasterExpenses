@@ -8,12 +8,12 @@
 import SwiftUI
 internal import UniformTypeIdentifiers
 
-struct ContentView: View {
-    @StateObject var expense: ExpenseModel = ExpenseModel()
-    @StateObject var heading: HeadingModel = HeadingModel()
+struct MasterView: View {
+    @EnvironmentObject var expense: ExpenseModel
+    @EnvironmentObject var head: HeadingModel
     var body: some View {
         VStack {
-            Text("heading loaded = \(heading.headings.count)")
+            
                 
             List(expense.expenses) { expense in
                 HStack {
@@ -29,5 +29,5 @@ struct ContentView: View {
 }
 
 #Preview {
-    ContentView()
+    MasterView()
 }
