@@ -11,14 +11,20 @@ struct HeadingsView: View {
     
     @EnvironmentObject var expense: ExpenseModel 
     @EnvironmentObject var head: HeadingModel
+    @Environment(\.selectedTab) var selectedTab
     
     var body: some View {
         VStack {
-                Button("Create Heading") {
-                    createHeading()
-            }
+            HStack {
+                
+            Text("heading loaded = \(head.headings.count)")
+            Text("on Tab #:\(selectedTab?.wrappedValue ?? 0)")
+//            Button("Create Heading") {
+//                    createHeading()
+//            }
             Button("Save ") {
                 head.save()
+            }
         }
             List(head.headings) { head in
                 HStack {

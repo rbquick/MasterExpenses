@@ -11,9 +11,10 @@ internal import UniformTypeIdentifiers
 struct MasterView: View {
     @EnvironmentObject var expense: ExpenseModel
     @EnvironmentObject var head: HeadingModel
+    @Environment(\.selectedTab) var selectedTab
     var body: some View {
         VStack {
-            
+            Text("on Tab #:\(selectedTab?.wrappedValue ?? 0)")
                 
             List(expense.expenses) { expense in
                 HStack {

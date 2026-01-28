@@ -7,12 +7,38 @@
 
 import SwiftUI
 
-struct MenuDriver: View {
-    var body: some View {
-        Text(/*@START_MENU_TOKEN@*/"Hello, World!"/*@END_MENU_TOKEN@*/)
+struct SelectedTabKey: EnvironmentKey {
+    static let defaultValue: Binding<Int>? = nil
+}
+
+extension EnvironmentValues {
+    var selectedTab: Binding<Int>? {
+        get { self[SelectedTabKey.self] }
+        set { self[SelectedTabKey.self] = newValue }
     }
 }
 
+struct MenuDriver: View {
+    @StateObject var expense: ExpenseModel = ExpenseModel()
+    @StateObject var heading: HeadingModel = HeadingModel()
+    @State private var selectedTab:Int = 1
+    var body: some View {
+        
+        TabView(selection: $selectedTab) {
+            MasterView().tabItem {
+                Text("Master")
+            }.tag(1)
+
+            HeadingsView().tabItem {
+                Text("Headings")
+            }.tag(2)
+
+        }
+        .environmentObject(expense)
+        .environmentObject(heading)
+        .environment(\.selectedTab, $selectedTab)
+    }
+}
 #Preview {
     MenuDriver()
 }
