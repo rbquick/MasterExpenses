@@ -14,4 +14,9 @@ class ExpenseModel: ObservableObject {
     internal init() {
         expenses = loadExpenses(from: "Expenses-master-spreadsheet")
     }
+    
+    func getYears() -> [Int] {
+        let years: Set<Int> = Set(expenses.map(\.year))
+        return years.sorted()
+    }
 }

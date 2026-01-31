@@ -6,7 +6,12 @@
 	objectVersion = 77;
 	objects = {
 
+/* Begin PBXBuildFile section */
+		71E694202F2ABAFF00D09C37 /* Expenses-master-spreadsheet.csv in Resources */ = {isa = PBXBuildFile; fileRef = 71E6941F2F2ABAFF00D09C37 /* Expenses-master-spreadsheet.csv */; };
+/* End PBXBuildFile section */
+
 /* Begin PBXFileReference section */
+		71E6941F2F2ABAFF00D09C37 /* Expenses-master-spreadsheet.csv */ = {isa = PBXFileReference; lastKnownFileType = text; path = "Expenses-master-spreadsheet.csv"; sourceTree = "<group>"; };
 		71E843BC2F25750700A7601E /* MasterExpenses.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = MasterExpenses.app; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
 
@@ -33,6 +38,7 @@
 			isa = PBXGroup;
 			children = (
 				71E843BE2F25750700A7601E /* MasterExpenses */,
+				71E6941F2F2ABAFF00D09C37 /* Expenses-master-spreadsheet.csv */,
 				71E843BD2F25750700A7601E /* Products */,
 			);
 			sourceTree = "<group>";
@@ -109,6 +115,7 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				71E694202F2ABAFF00D09C37 /* Expenses-master-spreadsheet.csv in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

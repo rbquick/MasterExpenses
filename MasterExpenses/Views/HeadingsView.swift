@@ -13,36 +13,31 @@ struct HeadingsView: View {
     @EnvironmentObject var head: HeadingModel
     @Environment(\.selectedTab) var selectedTab
     
+    @State private var searchText = ""
+    
     var body: some View {
         VStack {
-            HStack {
-                
-            Text("heading loaded = \(head.headings.count)")
-            Text("on Tab #:\(selectedTab?.wrappedValue ?? 0)")
-//            Button("Create Heading") {
-//                    createHeading()
-//            }
-            Button("Save ") {
-                head.save()
-            }
-        }
-            List(head.headings) { head in
+
+            List(head.headings.filter { searchText.isEmpty || $0.name.localizedCaseInsensitiveContains(searchText) }) { head in
                 HStack {
                     
                     Text(head.name)
                     Spacer()
-                    Text(head.tracking.description)
-                    Text(head.expense.description)
+                    HeadingTogglesView(name: head.name)
                 }
             }
+            .searchable(text: $searchText, prompt: "Search name")
         }
     }
 }
 
 #Preview {
     HeadingsView()
+        .environmentObject(ExpenseModel())
+        .environmentObject(HeadingModel())
 }
 extension HeadingsView {
+    // this is no longer required since the initial creation
     func createHeading() {
         head.deleteAll( )
         // Get unique expense names, sorted alphabetically

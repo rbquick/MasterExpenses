@@ -21,6 +21,7 @@ extension EnvironmentValues {
 struct MenuDriver: View {
     @StateObject var expense: ExpenseModel = ExpenseModel()
     @StateObject var heading: HeadingModel = HeadingModel()
+    @StateObject var mysearch: mySearchModel = mySearchModel()
     @State private var selectedTab:Int = 1
     var body: some View {
         
@@ -36,6 +37,7 @@ struct MenuDriver: View {
         }
         .environmentObject(expense)
         .environmentObject(heading)
+        .environmentObject(mysearch)
         .environment(\.selectedTab, $selectedTab)
     }
 }
