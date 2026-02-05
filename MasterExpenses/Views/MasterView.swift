@@ -20,18 +20,19 @@ struct MasterView: View {
     @EnvironmentObject var expense: ExpenseModel
     @EnvironmentObject var head: HeadingModel
     @EnvironmentObject var mySearch: mySearchModel
-    @Environment(\.selectedTab) var selectedTab
     @State private var selectedMode: Mode = .expenses
     @State var selectedYear1: Int = 2024
     @State var selectedYear2: Int = 2025
-    @State var showmonths: Bool = false
+    @State var showmonths: Bool = true
+    var showSign: Bool { selectedMode != .income && selectedMode !=  .incomeAll }
+
     var body: some View {
         VStack {
             HStack {
                 if !mySearch.searchIsShowing {
                     mySearchView()
                 }
-                    Text("Months")
+                Text("Months")
                 Toggle(
                     "Months",
                     isOn: Binding(
@@ -55,20 +56,26 @@ struct MasterView: View {
                     RoundedRectangle(cornerRadius: 6)
                         .stroke(Color.gray.opacity(0.3), lineWidth: 2)
                 )
-//                .padding(.vertical, 4)
+                //                .padding(.vertical, 4)
                 Text("Select Years")
                 HStack {
                     
-                Picker("Year", selection: $selectedYear1) {
-                    ForEach(expense.getYears(), id: \.self) { year in
-                        Text("\(year)")
+                    Picker("Year", selection: $selectedYear1) {
+                        ForEach(expense.getYears(), id: \.self) { year in
+                            Text("\(year)")
+                        }
                     }
-                }
-                Picker("Year", selection: $selectedYear2) {
-                    ForEach(expense.getYears(), id: \.self) { year in
-                        Text("\(year)")
+                    .onChange(of: selectedYear1) { orgValue, newValue in
+                        MyDefaults.shared.selectedYear1 = newValue
                     }
-                }
+                    Picker("Year", selection: $selectedYear2) {
+                        ForEach(expense.getYears(), id: \.self) { year in
+                            Text("\(year)")
+                        }
+                    }
+                    .onChange(of: selectedYear2) { orgValue, newValue in
+                        MyDefaults.shared.selectedYear2 = newValue
+                    }
                 }
                 .frame(width: 200, height: 40)
                 .overlay(
@@ -76,21 +83,90 @@ struct MasterView: View {
                         .stroke(Color.gray.opacity(0.3), lineWidth: 2)
                 )
             }
-            .padding()
+            .padding(.horizontal)
+            .onAppear {
+                selectedYear1 = MyDefaults.shared.selectedYear1
+                selectedYear2 = MyDefaults.shared.selectedYear2
+            }
             let myfiltered: [Expense] = mySearch.searchText.isEmpty ? expense.expenses : expense.expenses.filter { $0.name.localizedCaseInsensitiveContains(mySearch.searchText) }
             let filtered: [Expense] = {
                 switch selectedMode {
-                case .incomeAll:
-                    return myfiltered.selected(from: head.headings.withoutExpense, years: [selectedYear1, selectedYear2])
-                case .expensesAll:
-                    return myfiltered.selected(from: head.headings.withExpense, years: [selectedYear1, selectedYear2])
-                case .expenses:
-                    return myfiltered.selected(from: head.headings.withExpenseAndTracking, years: [selectedYear1, selectedYear2])
-                case .income:
-                    return myfiltered.selected(from: head.headings.withoutExpenseWithTracking, years: [selectedYear1, selectedYear2])
+                    case .incomeAll:
+                        return myfiltered.selected(from: head.headings.withoutExpense, years: [selectedYear1, selectedYear2])
+                    case .expensesAll:
+                        return myfiltered.selected(from: head.headings.withExpense, years: [selectedYear1, selectedYear2])
+                    case .expenses:
+                        return myfiltered.selected(from: head.headings.withExpenseAndTracking, years: [selectedYear1, selectedYear2])
+                    case .income:
+                        return myfiltered.selected(from: head.headings.withoutExpenseWithTracking, years: [selectedYear1, selectedYear2])
                 }
             }()
+            // Compute grand totals for each year from filtered expenses
+             var grandTotals: [Double] {
+                let year1Total = filtered.filter { $0.year == selectedYear1 && head.headingIsTracked($0.name) }.reduce(0) { $0 + $1.total }
+                let year2Total = filtered.filter { $0.year == selectedYear2 && head.headingIsTracked($0.name) }.reduce(0) { $0 + $1.total }
+
+                 return [year1Total, year2Total]
+            }
+            
+            var monthTotals: [Expense] {
+                let years = [selectedYear1, selectedYear2]
+                var results: [Expense] = []
+                for year in years {
+                    let yearExpenses = filtered.filter { $0.year == year }
+                    // Sum each month for this year
+                    let jan = yearExpenses.reduce(0) { $0 + $1.jan }
+                    let feb = yearExpenses.reduce(0) { $0 + $1.feb }
+                    let mar = yearExpenses.reduce(0) { $0 + $1.mar }
+                    let apr = yearExpenses.reduce(0) { $0 + $1.apr }
+                    let may = yearExpenses.reduce(0) { $0 + $1.may }
+                    let jun = yearExpenses.reduce(0) { $0 + $1.jun }
+                    let jul = yearExpenses.reduce(0) { $0 + $1.jul }
+                    let aug = yearExpenses.reduce(0) { $0 + $1.aug }
+                    let sep = yearExpenses.reduce(0) { $0 + $1.sep }
+                    let oct = yearExpenses.reduce(0) { $0 + $1.oct }
+                    let nov = yearExpenses.reduce(0) { $0 + $1.nov }
+                    let dec = yearExpenses.reduce(0) { $0 + $1.dec }
+                    let total = yearExpenses.reduce(0) { $0 + $1.total }
+                    let average = yearExpenses.isEmpty ? 0.0 : total / Double(yearExpenses.count)
+                    // Use a placeholder name, e.g. "Summary" for the summary entry
+                    results.append(Expense(name: "Summary", year: year, jan: jan, feb: feb, mar: mar, apr: apr, may: may, jun: jun, jul: jul, aug: aug, sep: sep, oct: oct, nov: nov, dec: dec, total: total, average: average))
+                }
+                return results
+            }
+            
+//            HStack {
+//                Text("Total \(String(format: "%d", selectedYear1)): $\(displayValue(grandTotals[0], showSign: showSign))")
+//                Spacer()
+//                Text("Total \(String(format: "%d", selectedYear2)): $\(displayValue(grandTotals[1], showSign: showSign))")
+//            }
+//            .font(.title2.bold())
+//            .padding()
+            // accumulate the expense.total by the year where selecteYear1 goes into grandtotal[0] and selectedYear2 goes into grandtotal[1] using the filtered array of Expense
+            VStack {
+                Text("Gand totals by month")
+                ForEach(monthTotals.sorted(by: { $0.year < $1.year })) { expense in
+                    HStack {
+                        Text(expense.year.description)
+                        if showmonths {
+                            HStack {
+                                masterMonthsview(expense: expense, showSign: showSign)
+                            }
+                        }
+                    Spacer()
+                        HStack {
+                            Text("$\(displayValue(expense.total, showSign: showSign))")
+                            Text("$\(displayValue(expense.average, showSign: showSign))")
+                        }
+                        .frame(width: 180, alignment: .trailing)
+                        .alignmentGuide(.trailing) { d in d[.trailing] }
+                    }
+                }
+            }
+            .padding(.horizontal)
+            .font(.system(size: 15))
             let grouped = Dictionary(grouping: filtered, by: { $0.name })
+            
             List {
                 ForEach(grouped.keys.sorted(), id: \.self) { name in
                     let expensesForName = grouped[name] ?? []
@@ -117,71 +193,29 @@ struct MasterView: View {
                             HStack {
                                 Text(expense.year.description)
                                 if showmonths {
-                                    
+                                    HStack {
+                                        masterMonthsview(expense: expense, showSign: showSign)
+                                    }
+                                }
+                            Spacer()
                                 HStack {
-                                    VStack(alignment: .trailing) {
-                                        Text("Jan")
-                                        Text("\(expense.jan, specifier: "%.02f")")
-                                    }.frame(maxWidth: .infinity)
-                                    VStack(alignment: .trailing) {
-                                        Text("Feb")
-                                        Text("\(expense.feb, specifier: "%.02f")")
-                                    }.frame(maxWidth: .infinity)
-                                    VStack(alignment: .trailing) {
-                                        Text("Mar")
-                                        Text("\(expense.mar, specifier: "%.02f")")
-                                    }.frame(maxWidth: .infinity)
-                                    VStack(alignment: .trailing) {
-                                        Text("Apr")
-                                        Text("\(expense.apr, specifier: "%.02f")")
-                                    }.frame(maxWidth: .infinity)
-                                    VStack(alignment: .trailing) {
-                                        Text("May")
-                                        Text("\(expense.may, specifier: "%.02f")")
-                                    }.frame(maxWidth: .infinity)
-                                    VStack(alignment: .trailing) {
-                                        Text("Jun")
-                                        Text("\(expense.jun, specifier: "%.02f")")
-                                    }.frame(maxWidth: .infinity)
-                                    VStack(alignment: .trailing) {
-                                        Text("Jul")
-                                        Text("\(expense.jul, specifier: "%.02f")")
-                                    }.frame(maxWidth: .infinity)
-                                    VStack(alignment: .trailing) {
-                                        Text("Aug")
-                                        Text("\(expense.aug, specifier: "%.02f")")
-                                    }.frame(maxWidth: .infinity)
-                                    VStack(alignment: .trailing) {
-                                        Text("Sep")
-                                        Text("\(expense.sep, specifier: "%.02f")")
-                                    }.frame(maxWidth: .infinity)
-                                    VStack(alignment: .trailing) {
-                                        Text("Oct")
-                                        Text("\(expense.oct, specifier: "%.02f")")
-                                    }.frame(maxWidth: .infinity)
-                                    VStack(alignment: .trailing) {
-                                        Text("Nov")
-                                        Text("\(expense.nov, specifier: "%.02f")")
-                                    }.frame(maxWidth: .infinity)
-                                    VStack(alignment: .trailing) {
-                                        Text("Dec")
-                                        Text("\(expense.dec, specifier: "%.02f")")
-                                    }.frame(maxWidth: .infinity)
+                                    Text("$\(displayValue(expense.total, showSign: showSign))")
+                                    Text("$\(displayValue(expense.average, showSign: showSign))")
                                 }
-                                }
-                                Spacer()
-                                Text("$\(expense.total, specifier: "%.2f")")
-                                Text("$\(expense.average, specifier: "%.2f")")
+                                .frame(width: 180, alignment: .trailing)
+                                .alignmentGuide(.trailing) { d in d[.trailing] }
                             }
                         }
                     }
                 }
             }
+            
+            .font(.system(size: 15))
         }
     }
+}
     
 
-}
 
 #Preview {
     MasterView()

@@ -33,6 +33,9 @@ class HeadingModel: ObservableObject {
         headings = []
         save()
     }
+    func headingIsTracked(_ name: String) -> Bool {
+        headingForName(name)?.tracking ?? false
+    }
     func headingForName(_ name: String) -> Heading? {
         headings.first { $0.name == name }
     }

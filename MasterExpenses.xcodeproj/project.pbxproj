@@ -8,10 +8,12 @@
 
 /* Begin PBXBuildFile section */
 		71E694202F2ABAFF00D09C37 /* Expenses-master-spreadsheet.csv in Resources */ = {isa = PBXBuildFile; fileRef = 71E6941F2F2ABAFF00D09C37 /* Expenses-master-spreadsheet.csv */; };
+		71E694282F2E3CDB00D09C37 /* masterMonthsview.swift in Sources */ = {isa = PBXBuildFile; fileRef = 71E694272F2E3CDB00D09C37 /* masterMonthsview.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
 		71E6941F2F2ABAFF00D09C37 /* Expenses-master-spreadsheet.csv */ = {isa = PBXFileReference; lastKnownFileType = text; path = "Expenses-master-spreadsheet.csv"; sourceTree = "<group>"; };
+		71E694272F2E3CDB00D09C37 /* masterMonthsview.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = masterMonthsview.swift; sourceTree = "<group>"; };
 		71E843BC2F25750700A7601E /* MasterExpenses.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = MasterExpenses.app; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
 
@@ -40,6 +42,7 @@
 				71E843BE2F25750700A7601E /* MasterExpenses */,
 				71E6941F2F2ABAFF00D09C37 /* Expenses-master-spreadsheet.csv */,
 				71E843BD2F25750700A7601E /* Products */,
+				71E694272F2E3CDB00D09C37 /* masterMonthsview.swift */,
 			);
 			sourceTree = "<group>";
 		};
@@ -126,6 +129,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				71E694282F2E3CDB00D09C37 /* masterMonthsview.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

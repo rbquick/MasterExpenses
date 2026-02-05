@@ -27,6 +27,25 @@ struct Expense: Codable, Identifiable {
         case name, year, jan, feb, mar, apr, may, jun, jul, aug, sep, oct, nov, dec, total, average
     }
     
+    // create an init for the Expense record for defaults
+    init(name: String, year: Int, jan: Double, feb: Double, mar: Double, apr: Double, may: Double, jun: Double, jul: Double, aug: Double, sep: Double, oct: Double, nov: Double, dec: Double, total: Double, average: Double) {
+        self.name = name
+        self.year = year
+        self.jan = jan
+        self.feb = feb
+        self.mar = mar
+        self.apr = apr
+        self.may = may
+        self.jun = jun
+        self.jul = jul
+        self.aug = aug
+        self.sep = sep
+        self.oct = oct
+        self.nov = nov
+        self.dec = dec
+        self.total = total
+        self.average = average
+    }
     init(from decoder: Decoder) throws {
         let container = try decoder.container(keyedBy: CodingKeys.self)
         name = try container.decode(String.self, forKey: .name)
