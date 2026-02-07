@@ -4,6 +4,14 @@
 //
 //  Created by Brian Quick on 2026-01-24.
 //
+/// The content and layout of the main expense and income summary view.
+///
+/// - Displays filter controls at the top, including month toggling, type selection, and year pickers.
+/// - Filters and groups expenses based on search text, selected mode, and selected years.
+/// - Shows yearly summary totals by month for the selected years.
+/// - Presents a sectioned list of expenses grouped by name, each section displaying details for the selected years and the difference.
+/// - Uses `ExpenseModel`, `HeadingModel`, and `mySearchModel` as environment objects for data and search state.
+/// - Computed summaries (such as `monthTotals`) are used for displaying aggregate year-over-year data.
 
 import SwiftUI
 internal import UniformTypeIdentifiers
@@ -25,6 +33,7 @@ struct MasterView: View {
     @State var selectedYear2: Int = 2025
     @State var showmonths: Bool = true
     var showSign: Bool { selectedMode != .income && selectedMode !=  .incomeAll }
+
 
     var body: some View {
         VStack {
@@ -88,26 +97,21 @@ struct MasterView: View {
                 selectedYear1 = MyDefaults.shared.selectedYear1
                 selectedYear2 = MyDefaults.shared.selectedYear2
             }
-            let myfiltered: [Expense] = mySearch.searchText.isEmpty ? expense.expenses : expense.expenses.filter { $0.name.localizedCaseInsensitiveContains(mySearch.searchText) }
             let filtered: [Expense] = {
+                let filteredExpenses = mySearch.searchText.isEmpty
+                    ? expense.expenses
+                    : expense.expenses.filter { $0.name.localizedCaseInsensitiveContains(mySearch.searchText) }
                 switch selectedMode {
                     case .incomeAll:
-                        return myfiltered.selected(from: head.headings.withoutExpense, years: [selectedYear1, selectedYear2])
+                        return filteredExpenses.selected(from: head.headings.withoutExpense, years: [selectedYear1, selectedYear2])
                     case .expensesAll:
-                        return myfiltered.selected(from: head.headings.withExpense, years: [selectedYear1, selectedYear2])
+                        return filteredExpenses.selected(from: head.headings.withExpense, years: [selectedYear1, selectedYear2])
                     case .expenses:
-                        return myfiltered.selected(from: head.headings.withExpenseAndTracking, years: [selectedYear1, selectedYear2])
+                        return filteredExpenses.selected(from: head.headings.withExpenseAndTracking, years: [selectedYear1, selectedYear2])
                     case .income:
-                        return myfiltered.selected(from: head.headings.withoutExpenseWithTracking, years: [selectedYear1, selectedYear2])
+                        return filteredExpenses.selected(from: head.headings.withoutExpenseWithTracking, years: [selectedYear1, selectedYear2])
                 }
             }()
-            // Compute grand totals for each year from filtered expenses
-             var grandTotals: [Double] {
-                let year1Total = filtered.filter { $0.year == selectedYear1 && head.headingIsTracked($0.name) }.reduce(0) { $0 + $1.total }
-                let year2Total = filtered.filter { $0.year == selectedYear2 && head.headingIsTracked($0.name) }.reduce(0) { $0 + $1.total }
-
-                 return [year1Total, year2Total]
-            }
             
             var monthTotals: [Expense] {
                 let years = [selectedYear1, selectedYear2]
@@ -128,20 +132,12 @@ struct MasterView: View {
                     let nov = yearExpenses.reduce(0) { $0 + $1.nov }
                     let dec = yearExpenses.reduce(0) { $0 + $1.dec }
                     let total = yearExpenses.reduce(0) { $0 + $1.total }
-                    let average = yearExpenses.isEmpty ? 0.0 : total / Double(yearExpenses.count)
+                    let average = yearExpenses.isEmpty ? 0.0 : total / 12
                     // Use a placeholder name, e.g. "Summary" for the summary entry
                     results.append(Expense(name: "Summary", year: year, jan: jan, feb: feb, mar: mar, apr: apr, may: may, jun: jun, jul: jul, aug: aug, sep: sep, oct: oct, nov: nov, dec: dec, total: total, average: average))
                 }
                 return results
             }
-            
-//            HStack {
-//                Text("Total \(String(format: "%d", selectedYear1)): $\(displayValue(grandTotals[0], showSign: showSign))")
-//                Spacer()
-//                Text("Total \(String(format: "%d", selectedYear2)): $\(displayValue(grandTotals[1], showSign: showSign))")
-//            }
-//            .font(.title2.bold())
-//            .padding()
             // accumulate the expense.total by the year where selecteYear1 goes into grandtotal[0] and selectedYear2 goes into grandtotal[1] using the filtered array of Expense
             VStack {
                 Text("Gand totals by month")

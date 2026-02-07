@@ -50,6 +50,27 @@ class HeadingModel: ObservableObject {
     }
 }
 
+/// A SwiftUI `View` that displays toggle switches for a heading's
+/// "expense" and "tracking" properties, allowing them to be modified interactively.
+///
+/// The toggles automatically persist changes via the `HeadingModel`'s `save()` method.
+/// The label next to the first toggle updates between "Expense" and "Income"
+/// based on the current expense state.
+///
+/// - Parameters:
+///   - name: The name of the heading to present toggles for.
+/// - EnvironmentObject:
+///   - head: The shared `HeadingModel` that manages headings.
+///
+/// - Note:
+///   If the specified heading cannot be found, default values (`false`) are used for both toggles.
+///   Changes made in this view are immediately applied to the underlying model and persisted.
+///
+/// Typical usage:
+/// ```swift
+/// HeadingTogglesView(name: "Groceries")
+///   .environmentObject(HeadingModel())
+/// ```
 struct HeadingTogglesView: View {
     let name: String
     @EnvironmentObject var head: HeadingModel

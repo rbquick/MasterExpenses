@@ -18,7 +18,7 @@ struct mySearchView: View {
     var body: some View {
         ZStack {
             Rectangle()
-                .foregroundColor(Color("SearchBar"))
+                .foregroundColor(.gray.opacity(0.2))
             HStack {
                 Image(systemName: "magnifyingglass")
                 TextField("Search ...", text: $vm.searchText) { startedSearching in
@@ -68,3 +68,4 @@ struct SearchView_Previews: PreviewProvider {
             .environmentObject(mySearchModel())
     }
 }
+

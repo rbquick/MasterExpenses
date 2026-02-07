@@ -123,18 +123,16 @@ func parseCSV(csvString: String) -> [Expense] {
             "average": Double(fields.count > 15 ? fields[15] : "") ?? 0.0
         ]
         
-        do {
-            if let jsonData = try? JSONSerialization.data(withJSONObject: expenseData),
-               let expense = try? JSONDecoder().decode(Expense.self, from: jsonData) {
-                expenses.append(expense)
-            }
-        } catch {
+        
+        if let jsonData = try? JSONSerialization.data(withJSONObject: expenseData),
+           let expense = try? JSONDecoder().decode(Expense.self, from: jsonData) {
+            expenses.append(expense)
+        } else {
             print("Failed to decode row: \(row)")
         }
+        
+        return expenses
     }
-    
-    return expenses
-}
 
 // Simple CSV row parser (handles basic comma separation)
 func parseCSVRow(_ row: String) -> [String] {
